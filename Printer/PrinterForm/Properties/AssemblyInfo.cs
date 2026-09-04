@@ -5,12 +5,12 @@ using System.Runtime.InteropServices;
 // 有关程序集的一般信息由以下
 // 控制。更改这些特性值可修改
 // 与程序集关联的信息。
-[assembly: AssemblyTitle("凤凰新华快递面单打印组件")]
-[assembly: AssemblyDescription("用于html格式的快递面单打印，如：快递鸟")]
+[assembly: AssemblyTitle("Tag Printer")]
+[assembly: AssemblyDescription("快递鸟电子面单与 HTML 标签本地打印组件")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("凤凰新华")]
-[assembly: AssemblyProduct("凤凰新华快递面单打印组件")]
-[assembly: AssemblyCopyright("Copyright ©  2024")]
+[assembly: AssemblyCompany("freesaber")]
+[assembly: AssemblyProduct("Tag Printer")]
+[assembly: AssemblyCopyright("Copyright © freesaber 2024-2026")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -32,5 +32,5 @@ using System.Runtime.InteropServices;
 //可以指定所有这些值，也可以使用“生成号”和“修订号”的默认值
 //通过使用 "*"，如下所示:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("1.0.0.1")]
-[assembly: AssemblyFileVersion("1.0.0.1")]
+[assembly: AssemblyVersion("1.1.0.0")]
+[assembly: AssemblyFileVersion("1.1.0.0")]

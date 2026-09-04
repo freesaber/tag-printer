@@ -1,0 +1,68 @@
+name: Build and Release
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+
+      - name: Setup NuGet
+        uses: NuGet/setup-nuget@v2
+
+      - name: Setup MSBuild
+        uses: microsoft/setup-msbuild@v3
+        with:
+          msbuild-architecture: x64
+
+      - name: Restore packages
+        run: nuget restore Printer/Printer.sln -PackagesDirectory Printer/packages
+
+      - name: Build x64 release
+        run: msbuild Printer/Printer.sln /t:Rebuild /m /p:Configuration=Release /p:Platform=x64 /p:SignManifests=false
+
+      - name: Install Inno Setup
+        run: choco install innosetup --no-progress -y
+
+      - name: Build installer
+        shell: pwsh
+        run: |
+          $version = if ("${{ github.ref_type }}" -eq "tag") { "${{ github.ref_name }}".TrimStart("v") } else { "0.0.0-dev" }
+          & "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe" "/DMyAppVersion=$version" "Helper\PrintForm.iss"
+
+      - name: Build portable archive
+        shell: pwsh
+        run: |
+          $stage = "dist\portable"
+          New-Item -ItemType Directory -Path $stage -Force | Out-Null
+          Copy-Item -Path "Printer\PrinterForm\bin\x64\Release\*" -Destination $stage -Recurse
+          Get-ChildItem -Path $stage -Recurse -Include "*.pdb", "*.xml" | Remove-Item -Force
+          Remove-Item -Path "$stage\app.publish" -Recurse -Force -ErrorAction SilentlyContinue
+          Compress-Archive -Path "$stage\*" -DestinationPath "dist\TagPrinter-portable-x64.zip" -Force
+
+      - name: Upload workflow artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: TagPrinter-x64
+          path: |
+            dist/TagPrinter-Setup-x64.exe
+            dist/TagPrinter-portable-x64.zip
+
+      - name: Publish GitHub Release
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          generate_release_notes: true
+          files: |
+            dist/TagPrinter-Setup-x64.exe
+            dist/TagPrinter-portable-x64.zip

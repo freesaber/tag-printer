@@ -1,21 +1,37 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>打印调用示例程序</title>
 </head>
 <body>
-    <button id="sendButton">发送数据</button>
+    <p id="status">正在连接 Tag Printer…</p>
+    <button id="sendButton" disabled>发送测试面单</button>
 
     <script>
         // 当页面加载完毕后执行
         window.onload = function() {
             // 获取按钮元素
             const sendButton = document.getElementById('sendButton');
+            const status = document.getElementById('status');
 
             // WebSocket连接
-            const socket = new WebSocket('ws://localhost:5597');
+            const socket = new WebSocket('ws://127.0.0.1:5597');
+
+            socket.onopen = function() {
+                status.textContent = '已连接，可以发送测试面单。';
+                sendButton.disabled = false;
+            };
+
+            socket.onclose = function() {
+                status.textContent = '连接已断开，请确认 Tag Printer 正在运行，然后刷新本页。';
+                sendButton.disabled = true;
+            };
+
+            socket.onerror = function() {
+                status.textContent = '连接失败，请先启动 Tag Printer，然后刷新本页。';
+            };
 
             // 当按钮被点击时
             sendButton.onclick = function() {

@@ -21,7 +21,7 @@ namespace PrinterForm
         {
             InitializeComponent();
             InitializeChromium();
-            this.Text = "快递面单打印组件";
+            this.Text = "Tag Printer - 快递面单打印组件";
         }
 
         private void InitializeChromium()
@@ -37,7 +37,8 @@ namespace PrinterForm
 
         private void StartWebSocket()
         {
-            server = new WebSocketServer("ws://0.0.0.0:5597");
+            // 仅监听本机回环地址，避免将无鉴权的打印接口暴露到局域网。
+            server = new WebSocketServer("ws://127.0.0.1:5597");
             server.Start(socket =>
             {
                 socket.OnOpen = () => Console.WriteLine("Open!");
